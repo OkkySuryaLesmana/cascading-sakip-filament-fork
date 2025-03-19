@@ -1,33 +1,22 @@
-import React, { useRef, useEffect, useState } from "react";
+import React, { createContext, useState, useContext } from "react";
 
-const TreeCardWrapper = ({ children, isVertical }) => {
-  const cardRefs = useRef([]);
-  const [maxHeight, setMaxHeight] = useState(0);
+const TreeHeightContext = createContext();
 
-  useEffect(() => {
-    if (!isVertical && cardRefs.current.length > 0) {
-      const heights = cardRefs.current.map((ref) => ref?.offsetHeight || 0);
-      setMaxHeight(Math.max(...heights));
-    }
-  }, [children, isVertical]);
+export const TreeHeightProvider = ({ children }) => {
+  const [maxHeights, setMaxHeights] = useState({});
 
-  // Assign ref to each card
-  const childrenWithRefs = React.Children.map(children, (child, index) =>
-    React.cloneElement(child, {
-      forwardedRef: (el) => (cardRefs.current[index] = el),
-      dynamicHeight: maxHeight,
-    })
-  );
+  const updateMaxHeight = (level, height) => {
+    setMaxHeights((prev) => ({
+      ...prev,
+      [level]: Math.max(prev[level] || 0, height),
+    }));
+  };
 
   return (
-    <div
-      className={`relative ${
-        isVertical ? "flex flex-col items-center" : "flex gap-6"
-      }`}
-    >
-      {childrenWithRefs}
-    </div>
+    <TreeHeightContext.Provider value={{ maxHeights, updateMaxHeight }}>
+      {children}
+    </TreeHeightContext.Provider>
   );
 };
 
-export default TreeCardWrapper;
+export const useTreeHeight = () => useContext(TreeHeightContext);

@@ -1,7 +1,7 @@
-import React, { useMemo } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import { BriefcaseBusiness, Gauge, Target, User2 } from "lucide-react";
+import { useTreeHeight } from "./cardWrapper";
 
-// Utility to count how many level-X cards under a node
 const countLevelXCards = (children, currentLevel = 1, targetLevel = 4) => {
   let count = 0;
   React.Children.forEach(children, (child) => {
@@ -17,7 +17,6 @@ const countLevelXCards = (children, currentLevel = 1, targetLevel = 4) => {
   return count;
 };
 
-// Analyze first, middle, last children
 const analyzeChildrenLevelCards = (
   children,
   currentLevel = 1,
@@ -52,8 +51,12 @@ const TreeCard = ({
   target = [],
   realisasi = [],
 }) => {
+  const { maxHeights, updateMaxHeight } = useTreeHeight();
+  const cardRef = useRef(null);
+  const [height, setHeight] = useState("auto");
+
   const hasChildren = Array.isArray(children) && children.length > 0;
-  const isVertical = level >= 4; // From level 4 and deeper, stack vertically
+  const isVertical = level >= 4;
   const sasaranTextColor = [2, 4, 5].includes(level)
     ? "text-black"
     : "text-white";
@@ -111,25 +114,20 @@ const TreeCard = ({
   const cardWidth = 350;
   const gap = 24;
 
-  // Memoized analysis for levels 1 & 2
   const analysis = useMemo(() => {
     if (level === 1 || level === 2)
       return analyzeChildrenLevelCards(children, level + 1, 4);
     return null;
   }, [children, level]);
 
-  // Calculate total width occupied by a group of cards
   const totalGroupWidth = (numCards) =>
     numCards > 0 ? numCards * cardWidth + (numCards - 1) * gap : 0;
 
-  // Half width for cropping connection lines
   const leftCrop = totalGroupWidth(analysis?.first || 0) / 2;
   const rightCrop = totalGroupWidth(analysis?.last || 0) / 2;
 
-  // Specific crop for level 3 (fixed, since it connects directly to level 4)
-  const fixedCrop = `calc(175px)`; // half of card width (350px)
+  const fixedCrop = `calc(175px)`;
 
-  // Line rendering logic for levels 1, 2, 3
   const renderHorizontalLine = !isVertical && children.length > 1 && (
     <>
       {level === 3 && (
@@ -149,6 +147,17 @@ const TreeCard = ({
       )}
     </>
   );
+  useEffect(() => {
+    if (cardRef.current) {
+      const cardHeight = cardRef.current.offsetHeight;
+      updateMaxHeight(level, cardHeight);
+    }
+  }, []);
+  useEffect(() => {
+    if (maxHeights[level]) {
+      setHeight(maxHeights[level]);
+    }
+  }, [maxHeights]);
 
   return (
     <div className="relative flex flex-col items-center">
@@ -157,6 +166,8 @@ const TreeCard = ({
 
       {/* Card */}
       <div
+        ref={cardRef}
+        style={{ height: height }}
         // className={`rounded-2xl shadow-md py-5 px-3 min-w-[180px] text-left flex flex-col justify-start w-[350px] text-white ${bgColor}`}
         className={`rounded-2xl shadow-md p-3 min-w-[180px] text-left flex flex-col justify-start ${
           level == 5 ? `w-[280px] mt-5` : `w-[350px]`

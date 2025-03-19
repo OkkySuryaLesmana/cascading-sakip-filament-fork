@@ -3,15 +3,13 @@ import React, { useRef, useState, useEffect } from "react";
 import TreeCard from "./component/treecard";
 import jsonData from "./json/data.json";
 import { Minus, Plus, RefreshCcw } from "lucide-react";
+import { TreeHeightProvider } from "./component/cardWrapper";
 
-// Recursive rendering function (unchanged)
 const renderTreeCard = (data, level = 1, parentIndex = "") => {
   return data.map((item, index) => {
     const key = `${level}-${parentIndex}${index}`;
 
     let children = null;
-
-    // Handle nested children depending on level
     if (level === 1 && item.sasaran_strategis_pd) {
       children = renderTreeCard(item.sasaran_strategis_pd, 2, `${index}-`);
     } else if (level === 2 && item.kinerja_program) {
@@ -62,18 +60,17 @@ const OrganizationTree = ({ jsonData }) => {
     scrollLeft: 0,
     scrollTop: 0,
   });
-  const [zoom, setZoom] = useState(1); // Zoom state
+  const [zoom, setZoom] = useState(1);
 
   useEffect(() => {
     const container = containerRef.current;
     if (container) {
       container.scrollLeft =
-        (container.scrollWidth - container.clientWidth) / 2; // Center horizontally
-      container.scrollTop = 0; // Align to top
+        (container.scrollWidth - container.clientWidth) / 2;
+      container.scrollTop = 0;
     }
   }, []);
 
-  // Mouse events for panning
   const handleMouseDown = (e) => {
     e.preventDefault();
     setIsDragging(true);
@@ -98,14 +95,12 @@ const OrganizationTree = ({ jsonData }) => {
   const handleMouseUp = () => setIsDragging(false);
   const handleMouseLeave = () => setIsDragging(false);
 
-  // Zoom handlers
-  const zoomIn = () => setZoom((prev) => Math.min(prev + 0.1, 5)); // Max zoom level
-  const zoomOut = () => setZoom((prev) => Math.max(prev - 0.1, 0.2)); // Min zoom level
-  const resetZoom = () => setZoom(1); // Reset zoom
+  const zoomIn = () => setZoom((prev) => Math.min(prev + 0.1, 5));
+  const zoomOut = () => setZoom((prev) => Math.max(prev - 0.1, 0.2));
+  const resetZoom = () => setZoom(1);
 
   return (
     <div className="relative h-screen w-full overflow-hidden bg-gray-100">
-      {/* Panning & zoomable container */}
       <div
         ref={containerRef}
         onMouseDown={handleMouseDown}
@@ -114,19 +109,19 @@ const OrganizationTree = ({ jsonData }) => {
         onMouseLeave={handleMouseLeave}
         className="h-full w-full overflow-auto cursor-grab active:cursor-grabbing"
       >
-        <div
-          className="flex justify-start items-start p-10 w-max"
-          style={{
-            transform: `scale(${zoom})`,
-            transformOrigin: "center center",
-            transition: "transform 0.3s ease-in-out",
-          }}
-        >
-          {renderTreeCard(jsonData)}
-        </div>
+        <TreeHeightProvider>
+          <div
+            className="flex justify-start items-start p-10 w-max"
+            style={{
+              transform: `scale(${zoom})`,
+              transformOrigin: "center center",
+              transition: "transform 0.3s ease-in-out",
+            }}
+          >
+            {renderTreeCard(jsonData)}
+          </div>
+        </TreeHeightProvider>
       </div>
-
-      {/* Zoom Controls */}
       <div className="fixed bottom-0 right-10 z-50 flex flex-col space-y-2 transform -translate-y-1/2">
         <div className="flex flex-col">
           <button
