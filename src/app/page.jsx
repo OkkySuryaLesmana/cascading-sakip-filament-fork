@@ -1,7 +1,6 @@
 "use client";
 import React, { useRef, useState, useEffect } from "react";
 import TreeCard from "./component/treecard";
-import jsonData from "./json/data.json";
 import {
   ChevronLeft,
   ChevronRight,
@@ -12,6 +11,7 @@ import {
 import { TreeHeightProvider } from "./component/cardWrapper";
 import axios from "axios";
 import DropdownFilter from "./component/dropdown";
+import { useSearchParams, useRouter } from "next/navigation";
 
 const renderTreeCard = (data, level = 1, parentIndex = "") => {
   return data.map((item, index) => {
@@ -60,29 +60,32 @@ const renderTreeCard = (data, level = 1, parentIndex = "") => {
 };
 
 const OrganizationTree = () => {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const idFromQuery = searchParams.get("id");
+  const yearFromQuery = searchParams.get("year");
+
   const containerRef = useRef(null);
-  const [isDragging, setIsDragging] = useState(false);
+
   const [jsonData, setJSONData] = useState([]);
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [selectedSatuanKerja, setSelectedSatuanKerja] = useState(
-    "Dinas Komunikasi dan Informatika Kabupaten Ciamis"
+  const [selectedSatuanKerja, setSelectedSatuanKerja] = useState("");
+  const [selectedSatuanKerjaID, setSelectedSatuanKerjaID] = useState(
+    idFromQuery ? Number(idFromQuery) : 596
   );
-  const [selectedSatuanKerjaID, setSelectedSatuanKerjaID] = useState(598);
-  const [selectedYear, setSelectedYear] = useState("2025");
-  const [start, setStart] = useState({
-    x: 0,
-    y: 0,
-    scrollLeft: 0,
-    scrollTop: 0,
-  });
+  const [selectedYear, setSelectedYear] = useState(yearFromQuery || "2025");
+
+  const [isDragging, setIsDragging] = useState(false);
   const [zoom, setZoom] = useState(0.6);
+  const [translate, setTranslate] = useState({ x: 0, y: 0 });
+  const [start, setStart] = useState({ x: 0, y: 0, prevX: 0, prevY: 0 });
+
   const getData = () => {
     axios
       .post(
         `https://situ.ciamiskab.go.id/api/v1/sakip/cascading?tahun=${selectedYear}&pd_id=${selectedSatuanKerjaID}`
       )
       .then((response) => {
-        console.log(response);
         setJSONData(response?.data);
         setTimeout(() => {
           centerView();
@@ -93,6 +96,10 @@ const OrganizationTree = () => {
   };
 
   useEffect(() => {
+    const params = new URLSearchParams();
+    params.set("id", selectedSatuanKerjaID);
+    params.set("year", selectedYear);
+    router.push(`?${params.toString()}`, { scroll: false });
     centerView();
     if (selectedSatuanKerjaID && selectedYear) {
       getData();
@@ -115,27 +122,57 @@ const OrganizationTree = () => {
     setStart({
       x: e.clientX,
       y: e.clientY,
-      scrollLeft: containerRef.current.scrollLeft,
-      scrollTop: containerRef.current.scrollTop,
+      prevX: translate.x,
+      prevY: translate.y,
     });
   };
 
   const handleMouseMove = (e) => {
     if (!isDragging) return;
-    const x = e.clientX;
-    const y = e.clientY;
-    const walkX = x - start.x;
-    const walkY = y - start.y;
-    containerRef.current.scrollLeft = start.scrollLeft - walkX;
-    containerRef.current.scrollTop = start.scrollTop - walkY;
+    setTranslate({
+      x: start.prevX + (e.clientX - start.x) / zoom, // Adjust for zoom
+      y: start.prevY + (e.clientY - start.y) / zoom, // Adjust for zoom
+    });
   };
 
   const handleMouseUp = () => setIsDragging(false);
   const handleMouseLeave = () => setIsDragging(false);
 
-  const zoomIn = () => setZoom((prev) => Math.min(prev + 0.1, 5));
-  const zoomOut = () => setZoom((prev) => Math.max(prev - 0.1, 0.2));
-  const resetZoom = () => setZoom(1);
+  const handleWheel = (e) => {
+    if (!e.ctrlKey) return;
+    e.preventDefault();
+
+    const rect = containerRef.current.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+
+    const scaleFactor = e.deltaY > 0 ? 0.9 : 1.1;
+    const newZoom = Math.min(Math.max(zoom * scaleFactor, 0.2), 2);
+
+    setTranslate({
+      x: mouseX - (mouseX - translate.x) * (newZoom / zoom),
+      y: mouseY - (mouseY - translate.y) * (newZoom / zoom),
+    });
+
+    setZoom(newZoom);
+  };
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (container) {
+      container.addEventListener("wheel", handleWheel, { passive: false });
+    }
+    return () => {
+      if (container) {
+        container.removeEventListener("wheel", handleWheel);
+      }
+    };
+  }, [zoom, translate]);
+
+  const resetZoom = () => {
+    setZoom(0.6);
+    setTranslate({ x: 0, y: 0 });
+  };
 
   return (
     <div className="relative h-screen w-full overflow-hidden bg-gray-100">
@@ -152,18 +189,22 @@ const OrganizationTree = () => {
         ) : (
           <TreeHeightProvider>
             <div
-              className="flex flex-row items-start p-10 w-fit  space-x-4"
+              className="flex flex-row items-start p-10 w-fit space-x-4"
               style={{
-                transform: `scale(${zoom})`,
-                transformOrigin: "center center",
-                transition: "transform 0.3s ease-in-out",
+                transform: `translate(${translate.x}px, ${translate.y}px) scale(${zoom})`,
+                transformOrigin: "top left",
+                transition: "transform 0.1s ease-out",
               }}
             >
-              {jsonData.map((item, index) => (
-                <div key={index} className="flex flex-col">
-                  {renderTreeCard([item])}
-                </div>
-              ))}
+              {jsonData.length === 0 ? (
+                <p className="text-gray-500">No data available</p>
+              ) : (
+                jsonData.map((item, index) => (
+                  <div key={index} className="flex flex-col">
+                    {renderTreeCard([item])}
+                  </div>
+                ))
+              )}
             </div>
           </TreeHeightProvider>
         )}
@@ -195,14 +236,14 @@ const OrganizationTree = () => {
       <div className="fixed bottom-0 right-10 z-50 flex flex-col space-y-2 transform -translate-y-1/2">
         <div className="flex flex-col">
           <button
-            onClick={zoomIn}
+            onClick={() => setZoom((z) => Math.min(z + 0.1, 2))}
             className="px-2 py-2 bg-white text-white rounded-t shadow"
           >
             <Plus color="#666666" size={16} strokeWidth={4} />
           </button>
           <hr style={{ width: "50%" }} />
           <button
-            onClick={zoomOut}
+            onClick={() => setZoom((z) => Math.max(z - 0.1, 0.2))}
             className="px-2 py-2 bg-white text-white rounded-b shadow"
           >
             <Minus color="#666666" size={16} strokeWidth={4} />
@@ -220,5 +261,5 @@ const OrganizationTree = () => {
 };
 
 export default function Page() {
-  return <OrganizationTree jsonData={jsonData} />;
+  return <OrganizationTree />;
 }

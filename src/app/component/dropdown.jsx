@@ -129,6 +129,17 @@ const DropdownFilter = ({
       .catch((error) => console.error("Error fetching data:", error));
   }, []);
 
+  useEffect(() => {
+    if (selectedSatuanKerjaID) {
+      const selectedItem = satuanKerja.find(
+        (item) => item.pd_id === selectedSatuanKerjaID
+      );
+      if (selectedItem) {
+        setSelectedSatuanKerja(selectedItem.name);
+      }
+    }
+  }, [selectedSatuanKerjaID, satuanKerja]);
+
   const handleSelectSatuanKerja = (name) => {
     const selectedItem = satuanKerja.find((item) => item.name === name);
     setSelectedSatuanKerja(name);

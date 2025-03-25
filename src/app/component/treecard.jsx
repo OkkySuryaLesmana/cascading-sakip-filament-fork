@@ -50,6 +50,9 @@ const TreeCard = ({
   level = 1,
   target = [],
   realisasi = [],
+  definisiOperasional = null,
+  rencanaAksi = null,
+  rencanaRealisasiAksi = null,
 }) => {
   const { maxHeights, updateMaxHeight } = useTreeHeight();
   const cardRef = useRef(null);
@@ -57,6 +60,13 @@ const TreeCard = ({
 
   const hasChildren = Array.isArray(children) && children.length > 0;
   const isVertical = level >= 4;
+
+  const buttons = [
+    { label: "DO", link: definisiOperasional },
+    { label: "RA", link: rencanaAksi },
+    { label: "RRA", link: rencanaRealisasiAksi },
+  ];
+
   const sasaranTextColor = [2, 4, 5].includes(level)
     ? "text-black"
     : "text-white";
@@ -174,21 +184,32 @@ const TreeCard = ({
         } text-white ${bgColor} ${cardHeight}`}
       >
         <div className="flex items-center justify-end pb-2 gap-2">
-          <div className="px-2 py-0.5 bg-[#e6f4ff] rounded-md border border-[#91caff] justify-center items-center flex cursor-pointer">
-            <div className="text-[#0958d9] text-xs font-medium leading-none py-1">
-              DO
-            </div>
-          </div>
-          <div className="px-2 py-0.5 bg-[#e6f4ff] rounded-md border border-[#91caff] justify-center items-center flex cursor-pointer">
-            <div className="text-[#0958d9] text-xs font-medium leading-none py-1">
-              RA
-            </div>
-          </div>
-          <div className="px-2 py-0.5 bg-[#e6f4ff] rounded-md border border-[#91caff] justify-center items-center flex cursor-pointer">
-            <div className="text-[#0958d9] text-xs font-medium leading-none py-1">
-              RRA
-            </div>
-          </div>
+          {buttons.map(
+            ({ label, link }) =>
+              link && (
+                <a
+                  key={label}
+                  href={link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-2 py-0.5 bg-[#e6f4ff] rounded-md border border-[#91caff] justify-center items-center flex cursor-pointer"
+                >
+                  <div className="text-[#0958d9] text-xs font-medium leading-none py-1">
+                    {label}
+                  </div>
+                </a>
+              )
+            //  : (
+            //   <div
+            //     key={label}
+            //     className="px-2 py-0.5 bg-[#e6f4ff] rounded-md border border-[#91caff] justify-center items-center flex cursor-pointer"
+            //   >
+            //     <div className="text-[#0958d9] text-xs font-medium leading-none py-1">
+            //       {label}
+            //     </div>
+            //   </div>
+            // )
+          )}
         </div>
         <div className={`flex flex-col mb-2 ${sasaranTextColor}`}>
           <span className="text-xs font-normal flex gap-2 items-center">
