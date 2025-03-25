@@ -59,21 +59,20 @@ const renderTreeCard = (data, level = 1, parentIndex = "") => {
   });
 };
 
-const OrganizationTree = () => {
-  const searchParams = useSearchParams();
+const OrganizationTree = ({ id, tahun }) => {
+  // const searchParams = useSearchParams();
   const router = useRouter();
-  const idFromQuery = searchParams.get("id");
-  const yearFromQuery = searchParams.get("year");
+  // const idFromQuery = searchParams.get("id");
+  // const yearFromQuery = searchParams.get("year");
 
   const containerRef = useRef(null);
 
   const [jsonData, setJSONData] = useState([]);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [selectedSatuanKerja, setSelectedSatuanKerja] = useState("");
-  const [selectedSatuanKerjaID, setSelectedSatuanKerjaID] = useState(
-    idFromQuery ? Number(idFromQuery) : 596
-  );
-  const [selectedYear, setSelectedYear] = useState(yearFromQuery || "2025");
+
+  const [selectedSatuanKerjaID, setSelectedSatuanKerjaID] = useState(id || 596);
+  const [selectedYear, setSelectedYear] = useState(tahun || "2025");
 
   const [isDragging, setIsDragging] = useState(false);
   const [zoom, setZoom] = useState(0.6);
@@ -94,6 +93,11 @@ const OrganizationTree = () => {
       })
       .catch((error) => console.error("Error fetching data:", error));
   };
+
+  useEffect(() => {
+    setSelectedSatuanKerjaID(id ? Number(id) : 596);
+    setSelectedYear(tahun || "2025");
+  }, [id, tahun]);
 
   useEffect(() => {
     const params = new URLSearchParams();
@@ -260,6 +264,13 @@ const OrganizationTree = () => {
   );
 };
 
-export default function Page() {
-  return <OrganizationTree />;
+export default function Page({ searchParams }) {
+  const params = React.use(searchParams); // Ensures it's properly unwrapped
+
+  return (
+    <OrganizationTree
+      id={params.id ? Number(params.id) : 596}
+      tahun={params.tahun || "2025"}
+    />
+  );
 }
