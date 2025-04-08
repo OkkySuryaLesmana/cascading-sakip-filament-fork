@@ -53,6 +53,7 @@ const TreeCard = ({
   definisiOperasional = null,
   rencanaAksi = null,
   rencanaRealisasiAksi = null,
+  handleButtonClick,
 }) => {
   const { maxHeights, updateMaxHeight } = useTreeHeight();
   const cardRef = useRef(null);
@@ -184,31 +185,30 @@ const TreeCard = ({
         } text-white ${bgColor} ${cardHeight}`}
       >
         <div className="flex items-center justify-end pb-2 gap-2">
-          {buttons.map(
-            ({ label, link }) =>
-              link && (
-                <a
-                  key={label}
-                  href={link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-2 py-0.5 bg-[#e6f4ff] rounded-md border border-[#91caff] justify-center items-center flex cursor-pointer"
-                >
-                  <div className="text-[#0958d9] text-xs font-medium leading-none py-1">
-                    {label}
-                  </div>
-                </a>
-              )
-            //  : (
-            //   <div
-            //     key={label}
-            //     className="px-2 py-0.5 bg-[#e6f4ff] rounded-md border border-[#91caff] justify-center items-center flex cursor-pointer"
-            //   >
-            //     <div className="text-[#0958d9] text-xs font-medium leading-none py-1">
-            //       {label}
-            //     </div>
-            //   </div>
-            // )
+          {buttons.map(({ label, link }) =>
+            label == "DO" ? (
+              <a
+                key={label}
+                href={link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-2 py-0.5 bg-[#e6f4ff] rounded-md border border-[#91caff] justify-center items-center flex cursor-pointer"
+              >
+                <div className="text-[#0958d9] text-xs font-medium leading-none py-1">
+                  {label}
+                </div>
+              </a>
+            ) : (
+              <div
+                key={label}
+                onClick={() => handleButtonClick(link)}
+                className="px-2 py-0.5 bg-[#e6f4ff] rounded-md border border-[#91caff] justify-center items-center flex cursor-pointer"
+              >
+                <div className="text-[#0958d9] text-xs font-medium leading-none py-1">
+                  {label}
+                </div>
+              </div>
+            )
           )}
         </div>
         <div className={`flex flex-col mb-2 ${sasaranTextColor}`}>

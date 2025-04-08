@@ -12,31 +12,45 @@ import { TreeHeightProvider } from "./component/cardWrapper";
 import axios from "axios";
 import DropdownFilter from "./component/dropdown";
 import { useSearchParams, useRouter } from "next/navigation";
+import ModalTable from "./component/modalTable";
 
-const renderTreeCard = (data, level = 1, parentIndex = "") => {
+const renderTreeCard = (
+  data,
+  level = 1,
+  parentIndex = "",
+  onCardButtonClick
+) => {
   return data.map((item, index) => {
     const key = `${level}-${parentIndex}${index}`;
 
     let children = null;
     if (level === 1 && item.sasaran_strategis_pd) {
-      children = renderTreeCard(item.sasaran_strategis_pd, 2, `${index}-`);
+      children = renderTreeCard(
+        item.sasaran_strategis_pd,
+        2,
+        `${index}-`,
+        onCardButtonClick
+      );
     } else if (level === 2 && item.kinerja_program) {
       children = renderTreeCard(
         item.kinerja_program,
         3,
-        `${parentIndex}${index}-`
+        `${parentIndex}${index}-`,
+        onCardButtonClick
       );
     } else if (level === 3 && item.kinerja_kegiatan) {
       children = renderTreeCard(
         item.kinerja_kegiatan,
         4,
-        `${parentIndex}${index}-`
+        `${parentIndex}${index}-`,
+        onCardButtonClick
       );
     } else if (level === 4 && item.kinerja_sub_kegiatan) {
       children = renderTreeCard(
         item.kinerja_sub_kegiatan,
         5,
-        `${parentIndex}${index}-`
+        `${parentIndex}${index}-`,
+        onCardButtonClick
       );
     }
 
@@ -50,8 +64,9 @@ const renderTreeCard = (data, level = 1, parentIndex = "") => {
         target={item.target}
         realisasi={item.realisasi}
         definisiOperasional={item.definisi_operasional}
-        rencanaAksi={item.rencana_aksi}
+        rencanaAksi={item.id}
         rencanaRealisasiAksi={item.rencana_realisasi_aksi}
+        handleButtonClick={onCardButtonClick} // <-- pass here
       >
         {children}
       </TreeCard>
@@ -78,6 +93,11 @@ const OrganizationTree = ({ id, tahun }) => {
   const [zoom, setZoom] = useState(0.6);
   const [translate, setTranslate] = useState({ x: 0, y: 0 });
   const [start, setStart] = useState({ x: 0, y: 0, prevX: 0, prevY: 0 });
+
+  // table
+
+  const [tableJSONData, setTableJSONData] = useState([]);
+  const [modalOpen, setModalOpen] = useState(false);
 
   const getData = () => {
     axios
@@ -178,6 +198,18 @@ const OrganizationTree = ({ id, tahun }) => {
     setTranslate({ x: 0, y: 0 });
   };
 
+  const onCardButtonClick = (id) => {
+    console.log(id);
+    axios
+      .post(
+        `https://situ.ciamiskab.go.id/api/v1/sakip/rencana-aksi?id_sasaran=${id}`
+      )
+      .then((response) => {
+        setTableJSONData(response?.data);
+        setModalOpen(true);
+      })
+      .catch((error) => console.error("Error fetching data:", error));
+  };
   return (
     <div className="relative h-screen w-full overflow-hidden bg-gray-100">
       <div
@@ -205,7 +237,7 @@ const OrganizationTree = ({ id, tahun }) => {
               ) : (
                 jsonData.map((item, index) => (
                   <div key={index} className="flex flex-col">
-                    {renderTreeCard([item])}
+                    {renderTreeCard([item], 1, "", onCardButtonClick)}
                   </div>
                 ))
               )}
@@ -260,6 +292,11 @@ const OrganizationTree = ({ id, tahun }) => {
           <RefreshCcw size={16} />
         </button>
       </div>
+      <ModalTable
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        data={tableJSONData}
+      />
     </div>
   );
 };
