@@ -244,8 +244,15 @@ const OrganizationTree = ({ id, tahun }) => {
 
     const image = canvas.toDataURL("image/png");
     const link = document.createElement("a");
+    const now = new Date();
+    const timestamp = now
+      .toISOString()
+      .replace(/[-:]/g, "")
+      .replace("T", "_")
+      .slice(0, 15);
+
     link.href = image;
-    link.download = `organization_tree_${selectedYear}.png`;
+    link.download = `cascading_${selectedSatuanKerja}_${selectedYear}_${timestamp}.png`;
     link.click();
   };
 
