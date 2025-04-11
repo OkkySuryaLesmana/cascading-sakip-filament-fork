@@ -4,21 +4,24 @@ import TreeCard from "./component/treecard";
 import {
   ChevronLeft,
   ChevronRight,
+  Download,
   Minus,
   Plus,
   RefreshCcw,
 } from "lucide-react";
-import { TreeHeightProvider } from "./component/cardWrapper";
+import { TreeHeightProvider, useTreeHeight } from "./component/cardWrapper";
 import axios from "axios";
 import DropdownFilter from "./component/dropdown";
 import { useSearchParams, useRouter } from "next/navigation";
 import ModalTable from "./component/modalTable";
+import html2canvas from "html2canvas";
 
 const renderTreeCard = (
   data,
   level = 1,
   parentIndex = "",
-  onCardButtonClick
+  onCardButtonClick,
+  resetKey
 ) => {
   return data.map((item, index) => {
     const key = `${level}-${parentIndex}${index}`;
@@ -29,34 +32,38 @@ const renderTreeCard = (
         item.sasaran_strategis_pd,
         2,
         `${index}-`,
-        onCardButtonClick
+        onCardButtonClick,
+        resetKey
       );
     } else if (level === 2 && item.kinerja_program) {
       children = renderTreeCard(
         item.kinerja_program,
         3,
         `${parentIndex}${index}-`,
-        onCardButtonClick
+        onCardButtonClick,
+        resetKey
       );
     } else if (level === 3 && item.kinerja_kegiatan) {
       children = renderTreeCard(
         item.kinerja_kegiatan,
         4,
         `${parentIndex}${index}-`,
-        onCardButtonClick
+        onCardButtonClick,
+        resetKey
       );
     } else if (level === 4 && item.kinerja_sub_kegiatan) {
       children = renderTreeCard(
         item.kinerja_sub_kegiatan,
         5,
         `${parentIndex}${index}-`,
-        onCardButtonClick
+        onCardButtonClick,
+        resetKey
       );
     }
 
     return (
       <TreeCard
-        key={key}
+        key={`${key}-${resetKey}`}
         sasaran={item.sasaran}
         indikator={item.indikator}
         pengampu={item.pengampu}
@@ -77,13 +84,16 @@ const renderTreeCard = (
 const OrganizationTree = ({ id, tahun }) => {
   // const searchParams = useSearchParams();
   const router = useRouter();
+  const treeContainerRef = useRef(null);
   // const idFromQuery = searchParams.get("id");
   // const yearFromQuery = searchParams.get("year");
+  const { resetMaxHeights, maxHeights } = useTreeHeight();
+  const [resetKey, setResetKey] = useState(0);
 
   const containerRef = useRef(null);
 
   const [jsonData, setJSONData] = useState([]);
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(true);
   const [selectedSatuanKerja, setSelectedSatuanKerja] = useState("");
 
   const [selectedSatuanKerjaID, setSelectedSatuanKerjaID] = useState(id || 596);
@@ -99,12 +109,17 @@ const OrganizationTree = ({ id, tahun }) => {
   const [tableJSONData, setTableJSONData] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
 
+  useEffect(() => {
+    console.log(maxHeights);
+  }, [maxHeights]);
   const getData = () => {
     axios
       .post(
         `https://situ.ciamiskab.go.id/api/v1/sakip/cascading?tahun=${selectedYear}&pd_id=${selectedSatuanKerjaID}`
       )
       .then((response) => {
+        resetMaxHeights();
+        setResetKey((prev) => prev + 1);
         setJSONData(response?.data);
         setTimeout(() => {
           centerView();
@@ -210,6 +225,30 @@ const OrganizationTree = ({ id, tahun }) => {
       })
       .catch((error) => console.error("Error fetching data:", error));
   };
+
+  const captureAndDownload = async () => {
+    if (!treeContainerRef.current) return;
+
+    const transformedNode = treeContainerRef.current.querySelector("div");
+    const originalStyle = transformedNode.getAttribute("style");
+
+    transformedNode.style.transform = "none";
+
+    const canvas = await html2canvas(treeContainerRef.current, {
+      backgroundColor: "#fff",
+      scale: 2,
+      useCORS: true,
+    });
+
+    transformedNode.setAttribute("style", originalStyle || "");
+
+    const image = canvas.toDataURL("image/png");
+    const link = document.createElement("a");
+    link.href = image;
+    link.download = `organization_tree_${selectedYear}.png`;
+    link.click();
+  };
+
   return (
     <div className="relative h-screen w-full overflow-hidden bg-gray-100">
       <div
@@ -223,26 +262,46 @@ const OrganizationTree = ({ id, tahun }) => {
         {jsonData.legnth == 0 ? (
           <></>
         ) : (
-          <TreeHeightProvider>
+          // <div ref={treeContainerRef}>
+          //   <div
+          //     className="flex flex-row items-start p-10 w-fit space-x-4"
+          //     style={{
+          //       transform: `translate(${translate.x}px, ${translate.y}px) scale(${zoom})`,
+          //       transformOrigin: "top left",
+          //       transition: "transform 0.1s ease-out",
+          //     }}
+          //   >
+          //     {jsonData.length === 0 ? (
+          //       <p className="text-gray-500">No data available</p>
+          //     ) : (
+          //       jsonData.map((item, index) => (
+          //         <div key={index} className="flex flex-col">
+          //           {renderTreeCard([item], 1, "", onCardButtonClick)}
+          //         </div>
+          //       ))
+          //     )}
+          //   </div>
+          // </div>
+          <div ref={treeContainerRef} className="w-fit h-fit bg-white p-10">
             <div
-              className="flex flex-row items-start p-10 w-fit space-x-4"
               style={{
                 transform: `translate(${translate.x}px, ${translate.y}px) scale(${zoom})`,
                 transformOrigin: "top left",
                 transition: "transform 0.1s ease-out",
               }}
+              className="flex flex-row items-start space-x-4"
             >
               {jsonData.length === 0 ? (
                 <p className="text-gray-500">No data available</p>
               ) : (
                 jsonData.map((item, index) => (
                   <div key={index} className="flex flex-col">
-                    {renderTreeCard([item], 1, "", onCardButtonClick)}
+                    {renderTreeCard([item], 1, "", onCardButtonClick, resetKey)}
                   </div>
                 ))
               )}
             </div>
-          </TreeHeightProvider>
+          </div>
         )}
       </div>
       <div>
@@ -270,6 +329,12 @@ const OrganizationTree = ({ id, tahun }) => {
         </div>
       </div>
       <div className="fixed bottom-0 right-10 z-50 flex flex-col space-y-2 transform -translate-y-1/2">
+        <button
+          onClick={captureAndDownload}
+          className="px-2 py-2 bg-sky-600 hover:bg-sky-700 text-white rounded shadow"
+        >
+          <Download size={16} strokeWidth={3} />
+        </button>
         <div className="flex flex-col">
           <button
             onClick={() => setZoom((z) => Math.min(z + 0.1, 2))}
@@ -305,9 +370,11 @@ export default function Page({ searchParams }) {
   const params = React.use(searchParams); // Ensures it's properly unwrapped
 
   return (
-    <OrganizationTree
-      id={params.id ? Number(params.id) : 596}
-      tahun={params.tahun || "2025"}
-    />
+    <TreeHeightProvider>
+      <OrganizationTree
+        id={params.id ? Number(params.id) : 596}
+        tahun={params.tahun || "2025"}
+      />
+    </TreeHeightProvider>
   );
 }

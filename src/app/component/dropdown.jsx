@@ -15,6 +15,7 @@ const Dropdown = ({
 
   const handleSelect = (option) => {
     setSelected(option);
+    setSearchTerm("");
     setIsOpen(false);
   };
   useEffect(() => {

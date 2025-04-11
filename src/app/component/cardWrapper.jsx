@@ -10,10 +10,18 @@ export const TreeHeightProvider = ({ children }) => {
       ...prev,
       [level]: Math.max(prev[level] || 0, height),
     }));
+    // console.log(maxHeights);
+  };
+
+  const resetMaxHeights = () => {
+    setMaxHeights({});
+    console.log("?");
   };
 
   return (
-    <TreeHeightContext.Provider value={{ maxHeights, updateMaxHeight }}>
+    <TreeHeightContext.Provider
+      value={{ maxHeights, updateMaxHeight, resetMaxHeights }}
+    >
       {children}
     </TreeHeightContext.Provider>
   );
