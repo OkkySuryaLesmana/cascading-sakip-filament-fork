@@ -92,7 +92,9 @@ export default function MultiLayeredTable() {
 
   const getData = () => {
     axios
-      .post(`${NEXT_PUBLIC_BASE_URL}/api/v1/sakip/rencana-aksi?id_sasaran=292`)
+      .post(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/sakip/rencana-aksi?id_sasaran=292`
+      )
       .then((response) => {
         setJSONData(response?.data);
       })

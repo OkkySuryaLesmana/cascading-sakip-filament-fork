@@ -120,7 +120,7 @@ const DropdownFilter = ({
 
   useEffect(() => {
     axios
-      .post("${NEXT_PUBLIC_BASE_URL}/api/v1/sakip/perangkat-daerah")
+      .post(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/sakip/perangkat-daerah`)
       .then((response) => {
         const uniqueData = Array.from(
           new Map(response.data.map((item) => [item.pd_id, item])).values()
