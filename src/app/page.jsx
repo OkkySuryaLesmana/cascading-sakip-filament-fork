@@ -269,26 +269,6 @@ const OrganizationTree = ({ id, tahun }) => {
         {jsonData.legnth == 0 ? (
           <></>
         ) : (
-          // <div ref={treeContainerRef}>
-          //   <div
-          //     className="flex flex-row items-start p-10 w-fit space-x-4"
-          //     style={{
-          //       transform: `translate(${translate.x}px, ${translate.y}px) scale(${zoom})`,
-          //       transformOrigin: "top left",
-          //       transition: "transform 0.1s ease-out",
-          //     }}
-          //   >
-          //     {jsonData.length === 0 ? (
-          //       <p className="text-gray-500">No data available</p>
-          //     ) : (
-          //       jsonData.map((item, index) => (
-          //         <div key={index} className="flex flex-col">
-          //           {renderTreeCard([item], 1, "", onCardButtonClick)}
-          //         </div>
-          //       ))
-          //     )}
-          //   </div>
-          // </div>
           <div ref={treeContainerRef} className="w-fit h-fit bg-white p-10">
             <div
               style={{
