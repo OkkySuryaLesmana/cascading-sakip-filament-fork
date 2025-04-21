@@ -115,7 +115,7 @@ const OrganizationTree = ({ id, tahun }) => {
   const getData = () => {
     axios
       .post(
-        `https://situ.ciamiskab.go.id/api/v1/sakip/cascading?tahun=${selectedYear}&pd_id=${selectedSatuanKerjaID}`
+        `${NEXT_PUBLIC_BASE_URL}/api/v1/sakip/cascading?tahun=${selectedYear}&pd_id=${selectedSatuanKerjaID}`
       )
       .then((response) => {
         resetMaxHeights();
@@ -217,7 +217,7 @@ const OrganizationTree = ({ id, tahun }) => {
     console.log(id);
     axios
       .post(
-        `https://situ.ciamiskab.go.id/api/v1/sakip/rencana-aksi?id_sasaran=${id}`
+        `${NEXT_PUBLIC_BASE_URL}/api/v1/sakip/rencana-aksi?id_sasaran=${id}`
       )
       .then((response) => {
         setTableJSONData(response?.data);

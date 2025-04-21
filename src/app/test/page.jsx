@@ -92,9 +92,7 @@ export default function MultiLayeredTable() {
 
   const getData = () => {
     axios
-      .post(
-        `https://situ.ciamiskab.go.id/api/v1/sakip/rencana-aksi?id_sasaran=292`
-      )
+      .post(`${NEXT_PUBLIC_BASE_URL}/api/v1/sakip/rencana-aksi?id_sasaran=292`)
       .then((response) => {
         setJSONData(response?.data);
       })
