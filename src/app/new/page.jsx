@@ -1,6 +1,6 @@
 "use client";
 import React, { useRef, useState, useEffect } from "react";
-import TreeCard from "./component/treecard";
+import TreeCard from "./treecard";
 import {
   ChevronLeft,
   ChevronRight,
@@ -9,13 +9,13 @@ import {
   Plus,
   RefreshCcw,
 } from "lucide-react";
-import { TreeHeightProvider, useTreeHeight } from "./component/cardWrapper";
+import { TreeHeightProvider, useTreeHeight } from "./cardWrapper";
 import axios from "axios";
-import DropdownFilter from "./component/dropdown";
+import DropdownFilter from "../component/dropdown";
 import { useSearchParams, useRouter } from "next/navigation";
-import ModalTable from "./component/modalTable";
+import ModalTable from "../component/modalTable";
 import html2canvas from "html2canvas";
-import dummyJson from "@/app/json/data.json";
+import dummyJson from "@/app/json/response_new.json";
 
 const renderTreeCard = (
   data,
@@ -24,37 +24,39 @@ const renderTreeCard = (
   onCardButtonClick,
   resetKey
 ) => {
+  // console.log(level);
+  // console.log(data);
   return data.map((item, index) => {
     const key = `${level}-${parentIndex}${index}`;
 
     let children = null;
-    if (level === 1 && item.sasaran_strategis_pd) {
+    if (level === 1 && item.lvl2) {
       children = renderTreeCard(
-        item.sasaran_strategis_pd,
+        item.lvl2,
         2,
         `${index}-`,
         onCardButtonClick,
         resetKey
       );
-    } else if (level === 2 && item.kinerja_program) {
+    } else if (level === 2 && item.lvl3) {
       children = renderTreeCard(
-        item.kinerja_program,
+        item.lvl3,
         3,
         `${parentIndex}${index}-`,
         onCardButtonClick,
         resetKey
       );
-    } else if (level === 3 && item.kinerja_kegiatan) {
+    } else if (level === 3 && item.lvl4) {
       children = renderTreeCard(
-        item.kinerja_kegiatan,
+        item.lvl4,
         4,
         `${parentIndex}${index}-`,
         onCardButtonClick,
         resetKey
       );
-    } else if (level === 4 && item.kinerja_sub_kegiatan) {
+    } else if (level === 4 && item.lvl5) {
       children = renderTreeCard(
-        item.kinerja_sub_kegiatan,
+        item.lvl5,
         5,
         `${parentIndex}${index}-`,
         onCardButtonClick,
@@ -63,18 +65,17 @@ const renderTreeCard = (
     }
 
     return (
+      // <div key={`${key}-${resetKey}`}></div>
       <TreeCard
         key={`${key}-${resetKey}`}
+        id={item.id}
+        tahun={item.tahun}
+        klasifikasi={item.klasifikasi}
         sasaran={item.sasaran}
         indikator={item.indikator}
         pengampu={item.pengampu}
-        program={item.program}
-        target={item.target}
-        realisasi={item.realisasi}
-        definisiOperasional={item.definisi_operasional}
-        rencanaAksi={item.id}
-        rencanaRealisasiAksi={item.rencana_realisasi_aksi}
-        handleButtonClick={onCardButtonClick} // <-- pass here
+        stakeholder={item.stakeholder}
+        handleButtonClick={onCardButtonClick}
       >
         {children}
       </TreeCard>
@@ -111,7 +112,7 @@ const OrganizationTree = ({ id, tahun }) => {
   const [modalOpen, setModalOpen] = useState(false);
 
   useEffect(() => {
-    console.log(maxHeights);
+    // console.log(maxHeights);
   }, [maxHeights]);
   const getData = () => {
     axios
@@ -121,8 +122,9 @@ const OrganizationTree = ({ id, tahun }) => {
       .then((response) => {
         resetMaxHeights();
         setResetKey((prev) => prev + 1);
-        setJSONData(response?.data);
-        // setJSONData(dummyJson);
+        // setJSONData(response?.data);
+        const all = Array.isArray(dummyJson) ? dummyJson : [dummyJson];
+        setJSONData(all);
         setTimeout(() => {
           centerView();
         }, 300);
@@ -216,7 +218,7 @@ const OrganizationTree = ({ id, tahun }) => {
   };
 
   const onCardButtonClick = (id) => {
-    console.log(id);
+    // console.log(id);
     axios
       .post(
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/sakip/rencana-aksi?id_sasaran=${id}`

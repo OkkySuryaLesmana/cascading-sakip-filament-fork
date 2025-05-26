@@ -1,6 +1,6 @@
 "use client";
 import React, { useRef, useState, useEffect } from "react";
-import TreeCard from "./component/treecard";
+import TreeCard from "../component/treecard";
 import {
   ChevronLeft,
   ChevronRight,
@@ -9,13 +9,60 @@ import {
   Plus,
   RefreshCcw,
 } from "lucide-react";
-import { TreeHeightProvider, useTreeHeight } from "./component/cardWrapper";
+import { TreeHeightProvider, useTreeHeight } from "../component/cardWrapper";
 import axios from "axios";
-import DropdownFilter from "./component/dropdown";
+import DropdownFilter from "../component/dropdown";
 import { useSearchParams, useRouter } from "next/navigation";
-import ModalTable from "./component/modalTable";
+import ModalTable from "../component/modalTable";
 import html2canvas from "html2canvas";
-import dummyJson from "@/app/json/data.json";
+
+const data = [
+  {
+    id: 27,
+    sasaran_strategis:
+      "Meningkatnya Pelayanan Publik yang Profesional, Berkualitas, dan Akuntabel",
+    indikator_sasaran_strategis: [
+      "Indeks Kepuasan Masyarakat",
+      "Hasil Evaluasi AKIP",
+      "Opini BPK",
+      "Level Maturitas SPIP",
+      "Nilai Sistem Merit",
+      "Indeks Kematangan SPBE",
+      "Indeks Kualitas Pengelolaan Arsip",
+      "Kontribusi PAD terhadap Pendapatan Daerah",
+    ],
+    pengampu: ["BUPATI"],
+    sasaran_strategis_pd: [
+      {
+        id: 291,
+        sasaran_strategis_satker: "Meningkatnya Indeks Kematangan SPBE",
+        iku: ["Indeks SPBE"],
+        pengampu: ["KEPALA DINAS KOMUNIKASI DAN INFORMATIKA"],
+      },
+      {
+        id: 298,
+        sasaran_strategis_satker:
+          "Meningkatnya Kualitas Kebijakan Tata Kelola Pemerintahan dan Kesejahteraan Rakyat ",
+        iku: [
+          "Persentase Kebijakan Bidang Kesejahteraan Rakyat yang ditetapkan dan ditindaklanjuti",
+          "Indeks Reformasi Hukum",
+          "Status kinerja penyelenggaraan Pemerintahan Daerah",
+          "Persentase Fasilitasi Kerja Sama Daerah",
+        ],
+        pengampu: ["SEKRETARIS DAERAH"],
+      },
+      {
+        id: 299,
+        sasaran_strategis_satker:
+          "Meningkatnya Kualitas Kebijakan Perekonomian dan Administrasi Pembangunan ",
+        iku: [
+          "Persentase Kebijakan Bidang Perekonomian dan Administrasi Pembangunan yang ditetapkan dan ditindaklanjuti",
+        ],
+        pengampu: ["SEKRETARIS DAERAH"],
+      },
+    ],
+  },
+];
 
 const renderTreeCard = (
   data,
@@ -121,8 +168,7 @@ const OrganizationTree = ({ id, tahun }) => {
       .then((response) => {
         resetMaxHeights();
         setResetKey((prev) => prev + 1);
-        setJSONData(response?.data);
-        // setJSONData(dummyJson);
+        setJSONData(data);
         setTimeout(() => {
           centerView();
         }, 300);
@@ -275,7 +321,7 @@ const OrganizationTree = ({ id, tahun }) => {
             <div
               style={{
                 transform: `translate(${translate.x}px, ${translate.y}px) scale(${zoom})`,
-                transformOrigin: "center center",
+                transformOrigin: "top left",
                 transition: "transform 0.1s ease-out",
               }}
               className="flex flex-row items-start space-x-4"
@@ -356,7 +402,7 @@ const OrganizationTree = ({ id, tahun }) => {
 };
 
 export default function Page({ searchParams }) {
-  const params = React.use(searchParams);
+  const params = React.use(searchParams); // Ensures it's properly unwrapped
 
   return (
     <TreeHeightProvider>

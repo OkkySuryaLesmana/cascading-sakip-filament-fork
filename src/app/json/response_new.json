@@ -1,0 +1,190 @@
+{
+  "id": 1,
+  "tahun": 2025,
+  "klasifikasi": "Ultimate Outcome",
+  "sasaran": "Meningkatnya Kualitas dan Pemanfaatan Data Statistik Sektoral",
+  "indikator": "Indeks Pembangunan Statistik",
+  "pengampu": "Superadmin Pemerintah Daerah Kabupaten Ciamis",
+  "stakeholder": [
+    "Dinas Komunikasi Dan Informatika",
+    "Badan Perencanaan Pembangunan Daerah"
+  ],
+  "lvl2": [
+    {
+      "id": 2,
+      "tahun": 2025,
+      "klasifikasi": "Intermediate Outcome",
+      "sasaran": "Terselenggaranya kegiatan statistik sektoral sesuai prinsip SDI",
+      "indikator": "Indeks Domain Prinsip SDI",
+      "pengampu": "Superadmin Pemerintah Daerah Kabupaten Ciamis",
+      "stakeholder": [],
+      "lvl3": [
+        {
+          "id": 1,
+          "tahun": 2025,
+          "klasifikasi": "Intermediate Outcome",
+          "sasaran": "Meningkatnya kualitas standar data statistik sektoral",
+          "indikator": "Nilai tingkat kematangan standar data",
+          "pengampu": "Superadmin Pemerintah Daerah Kabupaten Ciamis",
+          "stakeholder": [],
+          "lvl4": [
+            {
+              "id": 1,
+              "tahun": 2025,
+              "klasifikasi": "Immediate Outcome",
+              "sasaran": "Meningkatnya tingkat kematangan penerapan SDS",
+              "indikator": "Persentase data yang dilengkapi standar data",
+              "pengampu": "Superadmin Pemerintah Daerah Kabupaten Ciamis",
+              "stakeholder": [],
+              "lvl5": [
+                {
+                  "id": 1,
+                  "tahun": 2025,
+                  "klasifikasi": "Output",
+                  "sasaran": "Tersusunnya dokumen standar data statistik",
+                  "indikator": "Jumlah Dokumen",
+                  "pengampu": "Superadmin Pemerintah Daerah Kabupaten Ciamis",
+                  "stakeholder": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "tahun": 2025,
+          "klasifikasi": "Intermediate Outcome",
+          "sasaran": "Meningkatnya efektivitas interoperabilitas data",
+          "indikator": "Belum teridentifikasi",
+          "pengampu": "Superadmin Pemerintah Daerah Kabupaten Ciamis",
+          "stakeholder": []
+        },
+        {
+          "id": 2,
+          "tahun": 2025,
+          "klasifikasi": "Intermediate Outcome",
+          "sasaran": "Meningkatnya efektivitas interoperabilitas data",
+          "indikator": "Belum teridentifikasi",
+          "pengampu": "Superadmin Pemerintah Daerah Kabupaten Ciamis",
+          "stakeholder": []
+        },
+        {
+          "lvl4": [
+            {
+              "id": 2,
+              "tahun": 2025,
+              "klasifikasi": "Intermediate Outcome",
+              "sasaran": "Meningkatnya efektivitas interoperabilitas data",
+              "indikator": "Belum teridentifikasi",
+              "pengampu": "Superadmin Pemerintah Daerah Kabupaten Ciamis",
+              "stakeholder": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 1,
+      "tahun": 2025,
+      "klasifikasi": "Intermediate Outcome",
+      "sasaran": "Meningkatnya ketersediaan metadata statistik sektoral",
+      "indikator": "Nilai tingkat kematangan metadata ",
+      "pengampu": "Superadmin Pemerintah Daerah Kabupaten Ciamis",
+      "stakeholder": [],
+      "lvl3": [
+        {
+          "lvl4": [
+            {
+              "id": 1,
+              "tahun": 2025,
+              "klasifikasi": "Output",
+              "sasaran": "Tersusunnya dokumen standar data statistik",
+              "indikator": "Jumlah Dokumen",
+              "pengampu": "Superadmin Pemerintah Daerah Kabupaten Ciamis",
+              "stakeholder": []
+            }
+          ]
+        },
+        {
+          "lvl4": [
+            {
+              "id": 1,
+              "tahun": 2025,
+              "klasifikasi": "Output",
+              "sasaran": "Tersusunnya dokumen standar data statistik",
+              "indikator": "Jumlah Dokumen",
+              "pengampu": "Superadmin Pemerintah Daerah Kabupaten Ciamis",
+              "stakeholder": []
+            }
+          ]
+        },
+        {
+          "lvl4": [
+            {
+              "id": 1,
+              "tahun": 2025,
+              "klasifikasi": "Output",
+              "sasaran": "Tersusunnya dokumen standar data statistik",
+              "indikator": "Jumlah Dokumen",
+              "pengampu": "Superadmin Pemerintah Daerah Kabupaten Ciamis",
+              "stakeholder": []
+            }
+          ]
+        },
+        {
+          "lvl4": [
+            {
+              "id": 1,
+              "tahun": 2025,
+              "klasifikasi": "Output",
+              "sasaran": "Tersusunnya dokumen standar data statistik",
+              "indikator": "Jumlah Dokumen",
+              "pengampu": "Superadmin Pemerintah Daerah Kabupaten Ciamis",
+              "stakeholder": []
+            }
+          ]
+        },
+        {
+          "lvl4": [
+            {
+              "id": 1,
+              "tahun": 2025,
+              "klasifikasi": "Output",
+              "sasaran": "Tersusunnya dokumen standar data statistik",
+              "indikator": "Jumlah Dokumen",
+              "pengampu": "Superadmin Pemerintah Daerah Kabupaten Ciamis",
+              "stakeholder": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 1,
+      "tahun": 2025,
+      "klasifikasi": "Intermediate Outcome",
+      "sasaran": "Meningkatnya ketersediaan metadata statistik sektoral",
+      "indikator": "Nilai tingkat kematangan metadata ",
+      "pengampu": "Superadmin Pemerintah Daerah Kabupaten Ciamis",
+      "stakeholder": []
+    },
+    {
+      "id": 1,
+      "tahun": 2025,
+      "klasifikasi": "Intermediate Outcome",
+      "sasaran": "Meningkatnya ketersediaan metadata statistik sektoral",
+      "indikator": "Nilai tingkat kematangan metadata ",
+      "pengampu": "Superadmin Pemerintah Daerah Kabupaten Ciamis",
+      "stakeholder": []
+    },
+    {
+      "id": 1,
+      "tahun": 2025,
+      "klasifikasi": "Intermediate Outcome",
+      "sasaran": "Meningkatnya ketersediaan metadata statistik sektoral",
+      "indikator": "Nilai tingkat kematangan metadata ",
+      "pengampu": "Superadmin Pemerintah Daerah Kabupaten Ciamis",
+      "stakeholder": []
+    }
+  ]
+}

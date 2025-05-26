@@ -1,0 +1,62 @@
+[
+  {
+    "id": 1,
+    "klasifikasi": "Meningkatnya Kualitas dan Kapasitas Tata Kelola Pemerintahan Daerah",
+    "sasaran": "Indeks Reformasi Birokrasi",
+    "indikator_kinerja": "Gubernur",
+    "lvl2": [
+      {
+        "id": 1,
+        "klasifikasi": "Meningkatnya Kualitas dan Kapasitas Tata Kelola Pemerintahan Daerah",
+        "sasaran": "Indeks Reformasi Birokrasi",
+        "indikator_kinerja": "Gubernur",
+        "lvl3": [
+          {
+            "id": 1,
+            "klasifikasi": "Meningkatnya Kualitas dan Kapasitas Tata Kelola Pemerintahan Daerah",
+            "sasaran": "Indeks Reformasi Birokrasi",
+            "indikator_kinerja": "Gubernur",
+            "lvl4": [
+              {
+                "id": 1,
+                "klasifikasi": "Meningkatnya Kualitas dan Kapasitas Tata Kelola Pemerintahan Daerah",
+                "sasaran": "Indeks Reformasi Birokrasi",
+                "indikator_kinerja": "Gubernur",
+                "lvl5": [
+                  {
+                    "id": 1,
+                    "klasifikasi": "Meningkatnya Kualitas dan Kapasitas Tata Kelola Pemerintahan Daerah",
+                    "sasaran": "Indeks Reformasi Birokrasi",
+                    "indikator_kinerja": "Gubernur"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },  
+      {
+        "lvl3": [
+          {
+            "lvl4": [
+              {
+                "id": 1,
+                "klasifikasi": "Meningkatnya Kualitas dan Kapasitas Tata Kelola Pemerintahan Daerah",
+                "sasaran": "Indeks Reformasi Birokrasi",
+                "indikator_kinerja": "Gubernur",
+                "lvl5": [
+                  {
+                    "id": 1,
+                    "klasifikasi": "Meningkatnya Kualitas dan Kapasitas Tata Kelola Pemerintahan Daerah",
+                    "sasaran": "Indeks Reformasi Birokrasi",
+                    "indikator_kinerja": "Gubernur"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]
