@@ -13,7 +13,7 @@ import { TreeHeightProvider, useTreeHeight } from "./cardWrapper";
 import axios from "axios";
 import DropdownFilter from "../component/dropdown";
 import { useSearchParams, useRouter } from "next/navigation";
-import ModalTable from "../component/modalTable";
+import ModalTable from "../component/modalTable_2";
 import html2canvas from "html2canvas";
 import dummyJson from "@/app/json/response_new.json";
 
@@ -83,7 +83,7 @@ const renderTreeCard = (
   });
 };
 
-const OrganizationTree = ({ id, tahun }) => {
+const OrganizationTree = () => {
   // const searchParams = useSearchParams();
   const router = useRouter();
   const treeContainerRef = useRef(null);
@@ -98,8 +98,8 @@ const OrganizationTree = ({ id, tahun }) => {
   const [isCollapsed, setIsCollapsed] = useState(true);
   const [selectedSatuanKerja, setSelectedSatuanKerja] = useState("");
 
-  const [selectedSatuanKerjaID, setSelectedSatuanKerjaID] = useState(id || 596);
-  const [selectedYear, setSelectedYear] = useState(tahun || "2025");
+  const [selectedSatuanKerjaID, setSelectedSatuanKerjaID] = useState(596);
+  const [selectedYear, setSelectedYear] = useState("2025");
 
   const [isDragging, setIsDragging] = useState(false);
   const [zoom, setZoom] = useState(0.6);
@@ -115,34 +115,36 @@ const OrganizationTree = ({ id, tahun }) => {
     // console.log(maxHeights);
   }, [maxHeights]);
   const getData = () => {
-    axios
-      .post(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/sakip/cascading?tahun=${selectedYear}&pd_id=${selectedSatuanKerjaID}`
-      )
-      .then((response) => {
-        resetMaxHeights();
-        setResetKey((prev) => prev + 1);
-        // setJSONData(response?.data);
-        const all = Array.isArray(dummyJson) ? dummyJson : [dummyJson];
-        setJSONData(all);
-        setTimeout(() => {
-          centerView();
-        }, 300);
-        // setSatuanKerja(uniqueData);
-      })
-      .catch((error) => console.error("Error fetching data:", error));
+    const all = Array.isArray(dummyJson) ? dummyJson : [dummyJson];
+    setJSONData(all);
+    // axios
+    //   .post(`${process.env.NEXT_PUBLIC_BASE_URL_NEW}/filter-data`, {
+    //     tahun: 2025,
+    //     pengampu: "Superadmin Pemerintah Daerah Kabupaten Ciamis",
+    //     sasaran: "Menurunnya Kasus Stunting",
+    //   })
+    //   .then((response) => {
+    //     resetMaxHeights();
+    //     setResetKey((prev) => prev + 1);
+    //     // setJSONData(response?.data);
+    //     setTimeout(() => {
+    //       centerView();
+    //     }, 300);
+    //     // setSatuanKerja(uniqueData);
+    //   })
+    //   .catch((error) => console.error("Error fetching data:", error));
   };
 
   useEffect(() => {
-    setSelectedSatuanKerjaID(id ? Number(id) : 596);
-    setSelectedYear(tahun || "2025");
-  }, [id, tahun]);
+    setSelectedSatuanKerjaID(596);
+    setSelectedYear("2025");
+  }, []);
 
   useEffect(() => {
     const params = new URLSearchParams();
-    params.set("id", selectedSatuanKerjaID);
-    params.set("year", selectedYear);
-    router.push(`?${params.toString()}`, { scroll: false });
+    // params.set("id", selectedSatuanKerjaID);
+    // params.set("year", selectedYear);
+    // router.push(`?${params.toString()}`, { scroll: false });
     centerView();
     if (selectedSatuanKerjaID && selectedYear) {
       getData();
@@ -217,17 +219,16 @@ const OrganizationTree = ({ id, tahun }) => {
     setTranslate({ x: 0, y: 0 });
   };
 
-  const onCardButtonClick = (id) => {
-    // console.log(id);
-    axios
-      .post(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/sakip/rencana-aksi?id_sasaran=${id}`
-      )
-      .then((response) => {
-        setTableJSONData(response?.data);
-        setModalOpen(true);
-      })
-      .catch((error) => console.error("Error fetching data:", error));
+  const onCardButtonClick = (sasaran, indikator, klasifikasi, stakeholder) => {
+    setTableJSONData([
+      {
+        sasaran,
+        indikator,
+        klasifikasi,
+        stakeholder,
+      },
+    ]);
+    setModalOpen(true);
   };
 
   const captureAndDownload = async () => {
@@ -261,7 +262,7 @@ const OrganizationTree = ({ id, tahun }) => {
   };
 
   return (
-    <div className="relative h-screen w-full overflow-hidden bg-gray-100">
+    <div className="relative h-screen w-full overflow-hidden bg-white">
       <div
         ref={containerRef}
         onMouseDown={handleMouseDown}
@@ -357,15 +358,10 @@ const OrganizationTree = ({ id, tahun }) => {
   );
 };
 
-export default function Page({ searchParams }) {
-  const params = React.use(searchParams);
-
+export default function Page() {
   return (
     <TreeHeightProvider>
-      <OrganizationTree
-        id={params.id ? Number(params.id) : 596}
-        tahun={params.tahun || "2025"}
-      />
+      <OrganizationTree />
     </TreeHeightProvider>
   );
 }

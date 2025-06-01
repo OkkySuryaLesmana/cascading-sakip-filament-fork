@@ -1,6 +1,6 @@
 "use client";
 import React, { useRef, useState, useEffect } from "react";
-import TreeCard from "../component/treecard";
+import TreeCard from "../component/treecard_bupati";
 import {
   ChevronLeft,
   ChevronRight,
@@ -83,44 +83,13 @@ const renderTreeCard = (
         onCardButtonClick,
         resetKey
       );
-    } else if (level === 2 && item.kinerja_program) {
-      children = renderTreeCard(
-        item.kinerja_program,
-        3,
-        `${parentIndex}${index}-`,
-        onCardButtonClick,
-        resetKey
-      );
-    } else if (level === 3 && item.kinerja_kegiatan) {
-      children = renderTreeCard(
-        item.kinerja_kegiatan,
-        4,
-        `${parentIndex}${index}-`,
-        onCardButtonClick,
-        resetKey
-      );
-    } else if (level === 4 && item.kinerja_sub_kegiatan) {
-      children = renderTreeCard(
-        item.kinerja_sub_kegiatan,
-        5,
-        `${parentIndex}${index}-`,
-        onCardButtonClick,
-        resetKey
-      );
     }
 
     return (
+      // <div key={`${key}-${resetKey}`}></div>
       <TreeCard
         key={`${key}-${resetKey}`}
-        sasaran={item.sasaran}
-        indikator={item.indikator}
-        pengampu={item.pengampu}
-        program={item.program}
-        target={item.target}
-        realisasi={item.realisasi}
-        definisiOperasional={item.definisi_operasional}
-        rencanaAksi={item.id}
-        rencanaRealisasiAksi={item.rencana_realisasi_aksi}
+        items={item}
         handleButtonClick={onCardButtonClick} // <-- pass here
       >
         {children}
@@ -129,7 +98,7 @@ const renderTreeCard = (
   });
 };
 
-const OrganizationTree = ({ id, tahun }) => {
+const OrganizationTree = ({ tahun }) => {
   // const searchParams = useSearchParams();
   const router = useRouter();
   const treeContainerRef = useRef(null);
@@ -143,8 +112,6 @@ const OrganizationTree = ({ id, tahun }) => {
   const [jsonData, setJSONData] = useState([]);
   const [isCollapsed, setIsCollapsed] = useState(true);
   const [selectedSatuanKerja, setSelectedSatuanKerja] = useState("");
-
-  const [selectedSatuanKerjaID, setSelectedSatuanKerjaID] = useState(id || 596);
   const [selectedYear, setSelectedYear] = useState(tahun || "2025");
 
   const [isDragging, setIsDragging] = useState(false);
@@ -163,12 +130,12 @@ const OrganizationTree = ({ id, tahun }) => {
   const getData = () => {
     axios
       .post(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/sakip/cascading?tahun=${selectedYear}&pd_id=${selectedSatuanKerjaID}`
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/sakip/cascading-bupati?tahun=${selectedYear}`
       )
       .then((response) => {
         resetMaxHeights();
         setResetKey((prev) => prev + 1);
-        setJSONData(data);
+        setJSONData(response?.data);
         setTimeout(() => {
           centerView();
         }, 300);
@@ -178,20 +145,18 @@ const OrganizationTree = ({ id, tahun }) => {
   };
 
   useEffect(() => {
-    setSelectedSatuanKerjaID(id ? Number(id) : 596);
     setSelectedYear(tahun || "2025");
-  }, [id, tahun]);
+  }, [tahun]);
 
   useEffect(() => {
     const params = new URLSearchParams();
-    params.set("id", selectedSatuanKerjaID);
     params.set("year", selectedYear);
     router.push(`?${params.toString()}`, { scroll: false });
     centerView();
-    if (selectedSatuanKerjaID && selectedYear) {
+    if (selectedYear) {
       getData();
     }
-  }, [selectedSatuanKerjaID, selectedYear]);
+  }, [selectedYear]);
 
   const centerView = () => {
     const container = containerRef.current;
@@ -305,7 +270,7 @@ const OrganizationTree = ({ id, tahun }) => {
   };
 
   return (
-    <div className="relative h-screen w-full overflow-hidden bg-gray-100">
+    <div className="relative h-screen w-full overflow-hidden bg-white">
       <div
         ref={containerRef}
         onMouseDown={handleMouseDown}
@@ -342,17 +307,18 @@ const OrganizationTree = ({ id, tahun }) => {
       <div>
         <div
           className={`fixed top-5 left-0 z-50 flex flex-col space-y-2 bg-white shadow-lg rounded-r-lg p-2 transition-transform duration-300 ${
-            isCollapsed ? "-translate-x-[95%]" : "translate-x-0"
+            isCollapsed ? "-translate-x-[84%]" : "translate-x-0"
           }`}
         >
           <div className="flex gap-4">
             <DropdownFilter
               selectedSatuanKerja={selectedSatuanKerja}
               setSelectedSatuanKerja={setSelectedSatuanKerja}
-              selectedSatuanKerjaID={selectedSatuanKerjaID}
-              setSelectedSatuanKerjaID={setSelectedSatuanKerjaID}
+              selectedSatuanKerjaID={null}
+              setSelectedSatuanKerjaID={null}
               selectedYear={selectedYear}
               setSelectedYear={setSelectedYear}
+              showSatuanKerja={false}
             />
             <button
               onClick={() => setIsCollapsed(!isCollapsed)}
@@ -406,10 +372,7 @@ export default function Page({ searchParams }) {
 
   return (
     <TreeHeightProvider>
-      <OrganizationTree
-        id={params.id ? Number(params.id) : 596}
-        tahun={params.tahun || "2025"}
-      />
+      <OrganizationTree tahun={params.tahun || "2025"} />
     </TreeHeightProvider>
   );
 }

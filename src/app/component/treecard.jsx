@@ -311,7 +311,15 @@ const TreeCard = ({
       {hasChildren && level === 4 && (
         <div className="relative flex flex-col gap-2 ml-4 ">
           {/* Vertical line connecting all children */}
-          <div className="absolute left-0 top-0 bottom-[260px] w-0.5 bg-gray-400" />
+          <div
+            style={{
+              height:
+                maxHeights[5] / 2 +
+                  12 +
+                  (maxHeights[5] + 27.5) * (children.length - 1) || 0,
+            }}
+            className="absolute left-0 top-0 bottom-[260px] w-0.5 bg-gray-400"
+          />
 
           {children.map((child, index) => (
             <div key={index} className="relative flex items-center">

@@ -18,18 +18,19 @@ const Dropdown = ({
     setSearchTerm("");
     setIsOpen(false);
   };
+
   useEffect(() => {
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsOpen(false);
       }
     }
-
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
   return (
     <div ref={dropdownRef}>
       <h4 className="text-[14px] font-semibold text-[#1E1E1E] mb-[1px]">
@@ -59,6 +60,7 @@ const Dropdown = ({
             />
           </svg>
         </button>
+
         {isOpen && (
           <div className="absolute mt-2 w-full rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10">
             <div className="p-3">
@@ -115,10 +117,12 @@ const DropdownFilter = ({
   selectedYear,
   setSelectedYear,
   onApply,
+  showSatuanKerja = true,
 }) => {
   const [satuanKerja, setSatuanKerja] = useState([]);
 
   useEffect(() => {
+    if (!showSatuanKerja) return;
     axios
       .post(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/sakip/perangkat-daerah`)
       .then((response) => {
@@ -128,9 +132,10 @@ const DropdownFilter = ({
         setSatuanKerja(uniqueData);
       })
       .catch((error) => console.error("Error fetching data:", error));
-  }, []);
+  }, [showSatuanKerja]);
 
   useEffect(() => {
+    if (!showSatuanKerja) return;
     if (selectedSatuanKerjaID) {
       const selectedItem = satuanKerja.find(
         (item) => item.pd_id === selectedSatuanKerjaID
@@ -139,7 +144,7 @@ const DropdownFilter = ({
         setSelectedSatuanKerja(selectedItem.name);
       }
     }
-  }, [selectedSatuanKerjaID, satuanKerja]);
+  }, [selectedSatuanKerjaID, satuanKerja, showSatuanKerja]);
 
   const handleSelectSatuanKerja = (name) => {
     const selectedItem = satuanKerja.find((item) => item.name === name);
@@ -151,14 +156,17 @@ const DropdownFilter = ({
 
   return (
     <div className="flex items-center gap-2">
-      <Dropdown
-        label="Satuan Kerja"
-        placeholder="Pilih Satuan Kerja"
-        options={satuanKerja}
-        selected={selectedSatuanKerja}
-        setSelected={handleSelectSatuanKerja}
-        width="w-[700px]"
-      />
+      {showSatuanKerja && (
+        <Dropdown
+          label="Satuan Kerja"
+          placeholder="Pilih Satuan Kerja"
+          options={satuanKerja}
+          selected={selectedSatuanKerja}
+          setSelected={handleSelectSatuanKerja}
+          width="w-[700px]"
+        />
+      )}
+
       <Dropdown
         label="Tahun"
         placeholder="Tahun"

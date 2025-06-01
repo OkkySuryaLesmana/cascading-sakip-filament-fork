@@ -259,7 +259,7 @@ const OrganizationTree = ({ id, tahun }) => {
   };
 
   return (
-    <div className="relative h-screen w-full overflow-hidden bg-gray-100">
+    <div className="relative h-screen w-full overflow-hidden bg-white">
       <div
         ref={containerRef}
         onMouseDown={handleMouseDown}
