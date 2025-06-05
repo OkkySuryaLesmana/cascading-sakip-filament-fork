@@ -1,6 +1,6 @@
 "use client";
 import React, { useRef, useState, useEffect } from "react";
-import TreeCard from "../component/treecard_bupati";
+import TreeCard from "../component/bupati/treecard_bupati";
 import {
   ChevronLeft,
   ChevronRight,

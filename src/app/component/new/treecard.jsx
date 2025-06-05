@@ -7,17 +7,24 @@ const countLevelXCards = (children, currentLevel = 1, targetLevel = 4) => {
 
   React.Children.forEach(children, (child) => {
     if (!React.isValidElement(child)) return;
+
+    // flatten & filter to only valid React elements
     const childElems = React.Children.toArray(child.props.children).filter(
       React.isValidElement
     );
 
     const hasKids = childElems.length > 0;
+
+    // 1) at target depth → always count
+    // 2) if no kids and still under target → count (this is your shallow-leaf case)
     if (
       currentLevel === targetLevel ||
       (!hasKids && currentLevel < targetLevel)
     ) {
       count += 1;
     }
+
+    // recurse only if there *are* children
     if (hasKids) {
       count += countLevelXCards(childElems, currentLevel + 1, targetLevel);
     }
@@ -38,9 +45,13 @@ const analyzeChildrenLevelCards = (
   const result = { first: 0, middle: [], last: 0 };
 
   validChildren.forEach((child, index) => {
+    // collect only the React‐element grandchildren
     const grandkids = React.Children.toArray(child.props.children).filter(
       React.isValidElement
     );
+
+    // If this branch never has grandchildren → count 1
+    // Otherwise → recurse as usual
     const cnt =
       grandkids.length === 0
         ? 1
@@ -54,13 +65,31 @@ const analyzeChildrenLevelCards = (
   return result;
 };
 
-const TreeCard = ({ items, children = [], level = 1, handleButtonClick }) => {
+const TreeCard = ({
+  id,
+  tahun,
+  klasifikasi = "",
+  sasaran = "",
+  indikator = "",
+  pengampu = "",
+  stakeholder = [],
+  children = [],
+  level = 1,
+  handleButtonClick,
+}) => {
+  const hasContent = id !== undefined || klasifikasi || sasaran || indikator;
   const { maxHeights, updateMaxHeight } = useTreeHeight();
   const cardRef = useRef(null);
   const [height, setHeight] = useState("auto");
 
   const hasChildren = Array.isArray(children) && children.length > 0;
   const isVertical = level >= 4;
+
+  // const buttons = [
+  //   { label: "DO", link: definisiOperasional },
+  //   { label: "RA", link: rencanaAksi },
+  //   { label: "RRA", link: rencanaRealisasiAksi },
+  // ];
 
   const sasaranTextColor = [2, 4, 5].includes(level)
     ? "text-black"
@@ -169,74 +198,81 @@ const TreeCard = ({ items, children = [], level = 1, handleButtonClick }) => {
       {/* Top vertical connector */}
       {level > 1 && level != 5 && <div className="w-0.5 h-6 bg-gray-400" />}
 
-      {/* Card */}
-      <div
-        ref={cardRef}
-        style={{ height: height }}
-        // className={`rounded-2xl shadow-md py-5 px-3 min-w-[180px] text-left flex flex-col justify-start w-[350px] text-white ${bgColor}`}
-        className={`rounded-2xl shadow-md p-3 min-w-[180px] text-left flex flex-col justify-start ${
-          level == 5 ? `w-[280px] mt-5` : `w-[350px]`
-        } text-white ${bgColor} ${cardHeight}`}
-      >
-        <div className={`flex flex-col mb-2 ${sasaranTextColor}`}>
-          <span className="text-xs font-normal flex gap-2 items-center">
-            <Target size={16} />
-            {sasaranHeader}
-          </span>
-          <span className="text-base font-medium pl-[24px]">
-            {level == 1
-              ? items?.sasaran_strategis
-              : items?.sasaran_strategis_satker}
-          </span>
-        </div>
-
-        <div className={`flex flex-col mb-2 ${indikatorTextColor}`}>
-          <span className="text-xs font-normal flex gap-2 items-center">
-            <Gauge size={16} />
-            {indikatornHeader}
-          </span>
-          {level == 1 ? (
-            Array.isArray(items?.indikator_sasaran_strategis) &&
-            items?.indikator_sasaran_strategis.length > 1 ? (
-              <ul className="pl-[32px] list-disc space-y-1">
-                {items?.indikator_sasaran_strategis.map((item, idx) => (
-                  <li key={idx} className="text-base font-medium">
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <span className="text-base font-medium pl-[24px]">
-                {Array.isArray(items?.indikator_sasaran_strategis)
-                  ? items?.indikator_sasaran_strategis[0]
-                  : items?.indikator_sasaran_strategis}
+      {hasContent ? (
+        <>
+          {/* Card */}
+          <div
+            ref={cardRef}
+            style={{ height: height }}
+            // className={`rounded-2xl shadow-md py-5 px-3 min-w-[180px] text-left flex flex-col justify-start w-[350px] text-white ${bgColor}`}
+            className={`rounded-2xl shadow-md p-3 min-w-[180px] text-left flex flex-col justify-start ${
+              level == 5 ? `w-[280px] mt-5` : `w-[350px]`
+            } text-white ${bgColor} ${cardHeight}`}
+          >
+            <div className="flex items-center justify-end pb-2 gap-2">
+              <div
+                onClick={() =>
+                  handleButtonClick(
+                    sasaran,
+                    indikator,
+                    klasifikasi,
+                    stakeholder
+                  )
+                }
+                className="px-2 py-0.5 bg-[#e6f4ff] rounded-full border border-[#91caff] justify-center items-center flex cursor-pointer"
+              >
+                <div className="text-[#0958d9] font-bold leading-none py-1">
+                  P
+                </div>
+              </div>
+            </div>
+            <div className={`flex flex-col mb-2 ${sasaranTextColor}`}>
+              <span className="text-xs font-normal flex gap-2 items-center">
+                <Target size={16} />
+                {klasifikasi}
               </span>
-            )
-          ) : Array.isArray(items.iku) && items.iku.length > 1 ? (
-            <ul className="pl-[32px] list-disc space-y-1">
-              {items.iku.map((item, idx) => (
-                <li key={idx} className="text-base font-medium">
-                  {item}
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <span className="text-base font-medium pl-[24px]">
-              {Array.isArray(items.iku) ? items.iku[0] : items.iku}
-            </span>
-          )}
-        </div>
-        {level > 2 && <hr className="mt-3 mb-5 border-t-2" />}
-        <div className={`flex flex-col mb-2 ${pengampuTextColor}`}>
-          <span className="text-xs font-normal flex gap-2 items-center">
-            <User2 size={16} />
-            Pengampu
-          </span>
-          <span className="text-base font-medium pl-[24px]">
-            {items?.pengampu}
-          </span>
-        </div>
-      </div>
+              <span className="text-base font-medium pl-[24px]">{sasaran}</span>
+            </div>
+
+            <div className={`flex flex-col mb-2 ${indikatorTextColor}`}>
+              <span className="text-xs font-normal flex gap-2 items-center">
+                <Gauge size={16} />
+                Indikator Kinerja
+              </span>
+
+              {Array.isArray(indikator) && indikator.length > 1 ? (
+                <ul className="pl-[32px] list-disc space-y-1">
+                  {indikator.map((item, idx) => (
+                    <li key={idx} className="text-base font-medium">
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <span className="text-base font-medium pl-[24px]">
+                  {Array.isArray(indikator) ? indikator[0] : indikator}
+                </span>
+              )}
+            </div>
+            <div className={`flex flex-col mb-2 ${pengampuTextColor}`}>
+              <span className="text-xs font-normal flex gap-2 items-center">
+                <User2 size={16} />
+                Pengampu
+              </span>
+              <span className="text-base font-medium pl-[24px]">
+                {pengampu}
+              </span>
+            </div>
+          </div>
+        </>
+      ) : (
+        <>
+          <div
+            className="w-0.5 h-auto bg-gray-400"
+            style={{ height: height || 0 }}
+          />
+        </>
+      )}
 
       {/* Vertical connector to children */}
       {hasChildren && level !== 4 && <div className="w-0.5 h-6 bg-gray-400" />}
@@ -259,7 +295,10 @@ const TreeCard = ({ items, children = [], level = 1, handleButtonClick }) => {
       {hasChildren && level === 4 && (
         <div className="relative flex flex-col gap-2 ml-4 ">
           {/* Vertical line connecting all children */}
-          <div className="absolute left-0 top-0 bottom-[260px] w-0.5 bg-gray-400" />
+          <div
+            style={{ height: maxHeights[5] / 2 + 12 || 0 }}
+            className="absolute left-0 top-0 bottom-[260px] w-0.5 bg-gray-400"
+          />
 
           {children.map((child, index) => (
             <div key={index} className="relative flex items-center">

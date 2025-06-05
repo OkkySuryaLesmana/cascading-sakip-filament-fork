@@ -1,6 +1,6 @@
 "use client";
 import React, { useRef, useState, useEffect } from "react";
-import TreeCard from "./treecard";
+import TreeCard from "../component/new/treecard";
 import {
   ChevronLeft,
   ChevronRight,
@@ -9,11 +9,14 @@ import {
   Plus,
   RefreshCcw,
 } from "lucide-react";
-import { TreeHeightProvider, useTreeHeight } from "./cardWrapper";
+import {
+  TreeHeightProvider,
+  useTreeHeight,
+} from "../component/new/cardWrapper";
 import axios from "axios";
-import DropdownFilter from "../component/dropdown";
+import DropdownFilter from "../component/new/dropdown";
 import { useSearchParams, useRouter } from "next/navigation";
-import ModalTable from "../component/modalTable_2";
+import ModalTable from "../component/new/modalTable_2";
 import html2canvas from "html2canvas";
 import dummyJson from "@/app/json/response_new.json";
 
@@ -24,8 +27,6 @@ const renderTreeCard = (
   onCardButtonClick,
   resetKey
 ) => {
-  // console.log(level);
-  // console.log(data);
   return data.map((item, index) => {
     const key = `${level}-${parentIndex}${index}`;
 
@@ -96,10 +97,10 @@ const OrganizationTree = () => {
 
   const [jsonData, setJSONData] = useState([]);
   const [isCollapsed, setIsCollapsed] = useState(true);
-  const [selectedSatuanKerja, setSelectedSatuanKerja] = useState("");
 
-  const [selectedSatuanKerjaID, setSelectedSatuanKerjaID] = useState(596);
-  const [selectedYear, setSelectedYear] = useState("2025");
+  const [selectedYear, setSelectedYear] = useState("");
+  const [selectedPengampu, setSelectedPengampu] = useState("");
+  const [selectedSasaran, setSelectedSasaran] = useState("");
 
   const [isDragging, setIsDragging] = useState(false);
   const [zoom, setZoom] = useState(0.6);
@@ -111,45 +112,39 @@ const OrganizationTree = () => {
   const [tableJSONData, setTableJSONData] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
 
-  useEffect(() => {
-    // console.log(maxHeights);
-  }, [maxHeights]);
+  // useEffect(() => {
+  // }, [maxHeights]);
   const getData = () => {
-    const all = Array.isArray(dummyJson) ? dummyJson : [dummyJson];
-    setJSONData(all);
-    // axios
-    //   .post(`${process.env.NEXT_PUBLIC_BASE_URL_NEW}/filter-data`, {
-    //     tahun: 2025,
-    //     pengampu: "Superadmin Pemerintah Daerah Kabupaten Ciamis",
-    //     sasaran: "Menurunnya Kasus Stunting",
-    //   })
-    //   .then((response) => {
-    //     resetMaxHeights();
-    //     setResetKey((prev) => prev + 1);
-    //     // setJSONData(response?.data);
-    //     setTimeout(() => {
-    //       centerView();
-    //     }, 300);
-    //     // setSatuanKerja(uniqueData);
-    //   })
-    //   .catch((error) => console.error("Error fetching data:", error));
+    axios
+      .post(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/sakip/pohon-kinerja/filter-data`,
+        {
+          tahun: Number(selectedYear),
+          pengampu: selectedPengampu,
+          sasaran: selectedSasaran,
+        }
+      )
+      .then((response) => {
+        resetMaxHeights();
+        setResetKey((prev) => prev + 1);
+        const all = Array.isArray(response?.data)
+          ? response?.data
+          : [response?.data];
+        setJSONData(all);
+        setTimeout(() => {
+          centerView();
+        }, 300);
+        // setSatuanKerja(uniqueData);
+      })
+      .catch((error) => console.error("Error fetching data:", error));
   };
 
   useEffect(() => {
-    setSelectedSatuanKerjaID(596);
-    setSelectedYear("2025");
-  }, []);
-
-  useEffect(() => {
-    const params = new URLSearchParams();
-    // params.set("id", selectedSatuanKerjaID);
-    // params.set("year", selectedYear);
-    // router.push(`?${params.toString()}`, { scroll: false });
     centerView();
-    if (selectedSatuanKerjaID && selectedYear) {
+    if (selectedPengampu && selectedYear && selectedSasaran) {
       getData();
     }
-  }, [selectedSatuanKerjaID, selectedYear]);
+  }, [selectedPengampu, selectedYear, selectedSasaran]);
 
   const centerView = () => {
     const container = containerRef.current;
@@ -304,12 +299,12 @@ const OrganizationTree = () => {
         >
           <div className="flex gap-4">
             <DropdownFilter
-              selectedSatuanKerja={selectedSatuanKerja}
-              setSelectedSatuanKerja={setSelectedSatuanKerja}
-              selectedSatuanKerjaID={selectedSatuanKerjaID}
-              setSelectedSatuanKerjaID={setSelectedSatuanKerjaID}
               selectedYear={selectedYear}
               setSelectedYear={setSelectedYear}
+              selectedPengampu={selectedPengampu}
+              setSelectedPengampu={setSelectedPengampu}
+              selectedSasaran={selectedSasaran}
+              setSelectedSasaran={setSelectedSasaran}
             />
             <button
               onClick={() => setIsCollapsed(!isCollapsed)}
